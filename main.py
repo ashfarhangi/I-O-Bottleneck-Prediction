@@ -14,15 +14,15 @@ class Main:
 		# Lets initiate the values that are necessacry for our model.
 		url = 'http://skuld.cs.umass.edu/traces/storage/Financial1.spc.bz2'
 		self.boolWhile = True
-		vocabFreq=5
-		batchSize=512
-		epochs=100
-		segmentSize=1024
-		numLayers=5
+		self.vocabFreq=5
+		self.batchSize=512
+		self.epochs=100
+		self.segmentSize=1024
+		self.numLayers=5
 		#64 milli seconds
-		windowSize=64
-		trainMode =False
-		fileName='Financial1.spc'
+		self.windowSize=64
+		self.trainMode =False
+		self.fileName='Financial1.spc'
 	def main(self):
 		while self.boolWhile:
 			x.predict()

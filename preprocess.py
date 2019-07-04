@@ -20,6 +20,8 @@ class Preprocess:
 
 	def __init__(self):
 
+		counter = [['']]
+
 	def localLoad(self):
 		df = pd.read_excel("data/mem30s.xlsx")
 		print(df.head())
