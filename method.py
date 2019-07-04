@@ -1,4 +1,4 @@
-class seq2seq:
+class Method:
 	def __init__(self):
 		print("started")
 
