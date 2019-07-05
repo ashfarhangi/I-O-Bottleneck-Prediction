@@ -33,17 +33,17 @@ class Preprocess:
 					new_file.write(data)
 	def toggleDownload(self,dataDir,fileName, url):
 		# Create directory if not initiated
-		if os.path.exists(dataDir):
+		if not os.path.exists(dataDir):
 			print("File not found, creating directory as %s" % dataDir)
 			os.mkdir(dataDir)
-		filePathNobz2 = os.path.join(dataDir, fname)
-		filepath = filePathNobz2 + '.bz2'
+		filePathNobz2 = os.path.join(dataDir, fileName)
+		filePath = filePathNobz2 + '.bz2'
 		if not os.path.exists(filePathNobz2):
 			if not os.path.exists(filePath):
 				print("Downloading %s to %s" % (url, filePath))
 				filePath, _ = urllib.request.urlretrieve(url, filePath)
 				statinfo = os.stat(filePath)
-				print("Successfully downloaded", fname, statinfo.st_size, "bytes")
+				print("Successfully downloaded", fileName, statinfo.st_size, "bytes")
 				decompress_file(filePath, filePathNobz2)
 				return filePathNobz2
 			else:

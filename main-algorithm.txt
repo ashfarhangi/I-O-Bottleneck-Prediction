@@ -1,3 +1,10 @@
+TL-DR: this is the main py file where we handle the preprocessing, prediciton model, and plot customized for a specific project
+1.import file
+2.call preprocess methods for indexing the sectors (encode,decode)
+3.call prediciton model for start on sess 
+4. predict or train based on if statement and checkpoint 
+5. plot
+
 importing packages
 importing seq model.py, plot.py preprocess.py
 <Preprocess>
