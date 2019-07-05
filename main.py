@@ -1,7 +1,25 @@
 # Famous quotes: All code is garbage
 # Functionality over beauty
+
 # This is our main class where he handle the preprocessing, prediciton in one class
 # The goal is to have only two modules for preprocessing and one prediction module for the use of seq2seq model
+"""Here is the setup"""
+# Importing the packages
+# importing the model for seq2seq
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import numpy as np
 import preprocess
 import method

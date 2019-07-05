@@ -1,0 +1,58 @@
+importing packages
+importing seq model.py, plot.py preprocess.py
+<Preprocess>
+download link
+hyperparameters : batch, epochs and more
+toggle download<pre> 
+
+info: we use _ to ignore a value when unpacking
+x, _, y = (1, 2, 3) # x = 1, y = 3 
+
+<sector2index, index2sector> this is a preprocessing routine that we prepare the block sequence into segment size this could be the most important process in this project
+
+!!! This is a part when we input the raw trace file and put on the sectorfreq and window size in ms and the sector size 
+Just like normalizing the data we also decode it back to original to see the plots
+
+df2 where we split the rawfile with the sector frequency size and window
+so here is a sample
+123456w.sequence5 + ss+ws
+
+split into train test input and output
+
+print the size of train and test
+
+print the length of sector X lengh and sector y length
+
+X = input
+y = label
+
+input vocab size & label vocab size = len sector2index
+now we can delete the sector2index
+
+now we can random batch generate for more reliable prediciton <preprocess random generate>:
+
+!!!!<Prediction Seq2Seq>
+
+we call the model from <method>
+
+calling the layers, vocabs and more
+!!!!! vocab is important since in most nlp seq2seq the vocab size is set to 100k however in the sector the vocab can be unlimited
+
+lets create a model that we can restore after stopping. 
+sess.method.restoreLastCheckpoint()
+now we can toggle the train and predict mode: how cool is that!
+if trainmode == true
+	sess = method.train(trainBatch,valBat)
+else
+	input, label = val_batch.__next__()
+	ouput = model.predict(sess, input)
+
+we use dictionaries to save the list of outputs
+now we can decode by index to sector:
+<preprocess decode> to translate back to sector
+if decode.count('') == 0:
+	if decoded not in list:
+
+predicted and labels are plotted by their segment size vocab and window size
+
+Fin.
