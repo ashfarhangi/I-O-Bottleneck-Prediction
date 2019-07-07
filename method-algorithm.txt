@@ -1,0 +1,71 @@
+import libaries including tf 14
+
+class sec2sec(object):
+	the use of self is highly recommended
+
+tf.graph 
+A Graph contains a set of tf.Operation objects, which represent units of computation; and tf.Tensor objects, which represent the units of data that flow between operations.
+
+
+tf.reset graph
+Clears the default graph stack and resets the global default graph.
+
+
+!!! encode input by tf.placeholder eI_{}
+labels that represet real output eI
+
+self.inputEnc
+self.labels
+self.inputDec
+they are all placeholders for the size with the sequence
+
+Also a probalityKeep for holding the values of dropout ex:0.2
+
+defining basic LSTM Cell with embedding dimension with embdedding dimension
+stacked LSTM
+
+Now for parameter sharing with the training model and test lets use 
+variable scope:A context manager for defining ops that creates variables (layers).
+
+for the layers we use seq2seqmodel where i use
+embedding_rnn_seq2seq from legacy tf:
+inputs: encoder,decoder lstmcell, vocab size, embedding dimension
+same for the test
+
+
+lossWeights for the labels
+self.loss
+summary to add the losses toghter for console
+
+globalStep variable that can be further customized? yes
+globalStep is the number of batches seen by graph
+this is where the weights are updateded to minimize the loss 
+
+trainOperation = loss, adam optimzer 
+ex:
+ def training(loss,learning_rate):
+        tf.summary.scalar('loss',loss)
+        optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+
+        # Why 0 as the first parameter of the global_step tf.Variable?
+        global_step = tf.Variable(0, name='global_step',trainable=False)
+
+        train_op = optimizer.minimize(loss, global_step=global_step)
+
+        return train_op
+now for evaluation:
+
+TLDR: Input being fed by a feed dictionary to network
+def get_feed[self,X,Y,probalityKeep):
+	feedDict={self.InputEncode[t]}
+	this is where we use the batch size of SeqXLength input and length to update the dictionary this is o
+
+!!!! sess.run(train and loss running)
+trainBatch use the batchX and batchY to train
+we use the feed the batches manually by trainBatchGen.__next__()
+feed dictoinary is called
+loss is returned  
+
+def evaluationStep
+this is where we evaluate the evaluationBatchGen
+feed dictionary 
