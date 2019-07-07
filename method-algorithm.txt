@@ -1,3 +1,6 @@
+TL-DR:
+input encoder and labels, lstm cells, loss function for minimizing,
+manually feed the network with a batch
 import libaries including tf 14
 
 class sec2sec(object):
@@ -69,3 +72,9 @@ loss is returned
 def evaluationStep
 this is where we evaluate the evaluationBatchGen
 feed dictionary 
+
+train batch will generate and added to feed dictionary and will be added to feed dictionary
+the loss will be returned
+
+evaluation
+genreate feed dictionary loss_v (lossEva) is where we optimize our network
