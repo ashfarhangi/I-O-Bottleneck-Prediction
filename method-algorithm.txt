@@ -73,8 +73,12 @@ def evaluationStep
 this is where we evaluate the evaluationBatchGen
 feed dictionary 
 
-train batch will generate and added to feed dictionary and will be added to feed dictionary
-the loss will be returned
+train batch will generate and added to  and will be added to feed dictionary
+the loss is then returned
+THis is how we utilize the loss function
 
-evaluation
+evaluation step
+eval_batch_genuse the batchX and batch Y 
 genreate feed dictionary loss_v (lossEva) is where we optimize our network
+
+  fgf

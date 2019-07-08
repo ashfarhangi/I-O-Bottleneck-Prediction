@@ -17,11 +17,27 @@ import re
 # import numpy as np
 
 # importing the model for seq2seq
+
 from preprocess import Preprocess
 from method import Method
 # importing packages
 # importing seq model.py, plot.py preprocess.py
 class Main:
+
+	"""The main class where it handles two packages
+	
+	Attributes:
+	    batchSize (int): Description
+	    boolWhile (bool): Description
+	    epochs (int): Description
+	    fileName (str): Description
+	    numLayers (int): Description
+	    segmentSize (int): Description
+	    trainMode (bool): Description
+	    url (str): Description
+	    vocabFreq (int): Description
+	    windowSize (int): Description
+	"""
 	
 	def __init__(self):
 # <Preprocess>
@@ -42,12 +58,14 @@ class Main:
 		self.url = 'http://skuld.cs.umass.edu/traces/storage/Financial1.spc.bz2'
 	
 	def main(self):
+		
 		while self.boolWhile:
 			x.preprocess()
 			x.predict()
 			self.boolWhile = False
 	
 	def preprocess(self):
+
 		y.toggleDownload(dataDir='data',fileName=self.fileName, url = self.url)
 		_, sector2index,index2sector,_ =y.prepareSectorSequence(dataDir="data",
 			trace=self.fileName,vocabFreq=vocabFreq,windowSize=windowSize,
@@ -72,6 +90,7 @@ class Main:
 		batchValidationGenerate= y.batchRandomGenerate(testX,testY,batchSize)
 		#fin
 	def predict(self):
+
 		network= z.sec2sec(
 			trainSize=trainXCount,
 			batchSize=batchSize,

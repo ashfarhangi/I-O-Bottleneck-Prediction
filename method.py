@@ -63,27 +63,27 @@ class sec2sec(object):
 		return feedDictionary
 
     # run one batch for training
-	def trainBatch(self, sess, trainBatch_gen):
+	def trainBatch(self, sess, trainBatchGen):
         # get batches
-		batchX, batchY = trainBatch_gen.__next__()
+		batchX, batchY = trainBatchGen.__next__()
 #!!!! Important play with the keep probality to see changes
 		feedDictionary = self.getFeed(batchX, batchY, keep_prob=0.5)
 		summary,_, lossEval = sess.run([self.train_op, self.loss], feedDictionary)
 		return summary,lossEval
 
-	def evalStep(self, sess, eval_batch_gen):
+	def evalStep(self, sess, evalBatchGen):
         # get batches
-		batchX, batchY = eval_batch_gen.__next__()
+		batchX, batchY = evalBatchGen.__next__()
 		feedDictionary = self.getFeed(batchX, batchY, keep_prob=1.)
 		lossEval, decodeOpEval = sess.run([self.loss, self.decode_outputs_test_fwd], feedDictionary)
 		decodeOpEval = np.array(decodeOpEval).transpose([1,0,2])
 		return lossEval, decodeOpEval, batchX, batchY
 
-    # evaluate 'num_batches' batches
-	def evalBatche(self, sess, eval_batch_gen, num_batches):
+    # evaluate 'numBatches' batches
+	def evalBatch(self, sess, evalBatchGen, numBatches):
 		losses = []
-		for i in range(num_batches):
-			lossEval, decodeOpEval, batchX, batchY = self.evalStep(sess, eval_batch_gen)
+		for i in range(numBatches):
+			lossEval, decodeOpEval, batchX, batchY = self.evalStep(sess, evalBatchGen)
 			losses.append(lossEval)
 		return np.mean(losses)
 	def train(self, train_set, valid_set, sess=None ):
@@ -120,7 +120,7 @@ class sec2sec(object):
 					print('Interrupted by user at iteration {}'.format(i))
 					self.session = sess
 				if j and j % valLossEvaluationStep == 0:
-					val_loss = self.evalBatche(sess, valid_set, 8)
+					val_loss = self.evalBatch(sess, valid_set, 8)
                     # writer.add_summary(summary)
 					steps_eval_time = time.time() - steps_start_time
 					print('val loss : {0:.6f} in {1:.2f} secs Epoch: {2}/{3} step/epoch'.format(val_loss,
@@ -139,7 +139,7 @@ class sec2sec(object):
             # save model to disk
 			saver.save(sess, self.checkPointPath + self.methodName + '.ckpt', global_step=i)
             # evaluate to get validation loss
-			val_loss = self.evalBatche(sess, valid_set, 8)  # TODO : and this
+			val_loss = self.evalBatch(sess, valid_set, 8)  # TODO : and this
 			epoch_eval_time = time.time() - epoch_start_time
 			print('val loss : {0:.6f} in {1:.2f} secs Epoch: {2} epoch'.format(val_loss, epoch_eval_time, i))
 			epoch_start_time = time.time()
