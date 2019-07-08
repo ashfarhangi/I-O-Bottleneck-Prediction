@@ -68,23 +68,23 @@ class sec2sec(object):
 		batchX, batchY = trainBatch_gen.__next__()
 #!!!! Important play with the keep probality to see changes
 		feedDictionary = self.getFeed(batchX, batchY, keep_prob=0.5)
-		_, loss_v = sess.run([self.train_op, self.loss], feedDictionary)
-		return loss_v
+		summary,_, lossEval = sess.run([self.train_op, self.loss], feedDictionary)
+		return summary,lossEval
 
 	def evalStep(self, sess, eval_batch_gen):
         # get batches
 		batchX, batchY = eval_batch_gen.__next__()
 		feedDictionary = self.getFeed(batchX, batchY, keep_prob=1.)
-		loss_v, dec_op_v_fwd = sess.run([self.loss, self.decode_outputs_test_fwd], feedDictionary)
-		dec_op_v_fwd = np.array(dec_op_v_fwd).transpose([1,0,2])
-		return loss_v, dec_op_v_fwd, batchX, batchY
+		lossEval, decodeOpEval = sess.run([self.loss, self.decode_outputs_test_fwd], feedDictionary)
+		decodeOpEval = np.array(decodeOpEval).transpose([1,0,2])
+		return lossEval, decodeOpEval, batchX, batchY
 
     # evaluate 'num_batches' batches
 	def evalBatche(self, sess, eval_batch_gen, num_batches):
 		losses = []
 		for i in range(num_batches):
-			loss_v, dec_op_v_fwd, batchX, batchY = self.evalStep(sess, eval_batch_gen)
-			losses.append(loss_v)
+			lossEval, decodeOpEval, batchX, batchY = self.evalStep(sess, eval_batch_gen)
+			losses.append(lossEval)
 		return np.mean(losses)
 	def train(self, train_set, valid_set, sess=None ):
         
@@ -103,8 +103,8 @@ class sec2sec(object):
 		batchSize = self.batchSize[0]
 		numSteps = inputSize//batchSize
 		print(numSteps)
-		prev_val_loss = 1000000
-		prev_val_losses = list()
+		previousValLoss = 1000000
+		previousValLosses = list()
 		patience = 100
 		valLossEvaluationStep = 100
 		for i in range(self.epochs):
@@ -125,15 +125,15 @@ class sec2sec(object):
 					steps_eval_time = time.time() - steps_start_time
 					print('val loss : {0:.6f} in {1:.2f} secs Epoch: {2}/{3} step/epoch'.format(val_loss,
                                                                                                 steps_eval_time, j, i))
-					if i > 0 and val_loss > prev_val_loss:
+					if i > 0 and val_loss > previousValLoss:
 						saver.save(sess, self.checkPointPath + self.methodName + '.ckpt', global_step=i)
-						prev_val_losses.append(val_loss)
-						if len(prev_val_losses) >= patience:
+						previousValLoss.append(val_loss)
+						if len(previousValLoss) >= patience:
 							print("Early stopping at {0}/{1} with validation loss: {2}".format(j, i, val_loss))
 							return sess
-					if val_loss < prev_val_loss and prev_val_losses is not None:
-						prev_val_losses = list()
-					prev_val_loss = val_loss
+					if val_loss < previousValLoss and previousValLoss is not None:
+						previousValLoss = list()
+					previousValLoss = val_loss
 					steps_start_time = time.time()
 
             # save model to disk
@@ -168,12 +168,12 @@ class sec2sec(object):
 	def predict(self, sess, X):
 		feedDictionary = {self.enc_ip[t]: X[t] for t in range(self.xseq_len)}
 		feedDictionary[self.keep_prob] = 1.
-		dec_op_v_fwd = sess.run(self.decode_outputs_test_fwd, feedDictionary)
+		decodeOpEval = sess.run(self.decode_outputs_test_fwd, feedDictionary)
         # dec_op_v is a list; also need to transpose 0,1 indices
         #  (interchange batch_size and timesteps dimensions
-		dec_op_v_fwd = np.array(dec_op_v_fwd).transpose([1,0,2])
+		decodeOpEval = np.array(decodeOpEval).transpose([1,0,2])
         # return the index of item with highest probability
-		return np.argmax(dec_op_v_fwd, axis=2)
+		return np.argmax(decodeOpEval, axis=2)
 
 if __name__ == "__main__":
 	print("nothing to show here")
