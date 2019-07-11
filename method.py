@@ -36,9 +36,9 @@ class sec2sec(object):
 			self.inputEnc = [ tf.placeholder(shape=[None,],dtype=tf.init64, name='ie_{}'.format(t)) for t in range(sequenceXLength)]
 			self.labels = [tf.placeholder(shape =[None,],dtype=tf.init64,name="ie_{}".format(t)) for t in range(sequenceYLength)]
 			self.inputDec = [ tf.zeros_like(self.enc_ip[0], dtype=tf.int64, name='GO') ] + self.labels[:-1]
-			self.probalityKeep = tf.placeholder(tf.float32)
+			self.probKeep = tf.placeholder(tf.float32)
 
-			basicLSTM=tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.BasicLSTMCell(embeddedDim),output_keep_prob=self.probalityKeep)
+			basicLSTM=tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.BasicLSTMCell(embeddedDim),output_probKeep=self.probKeep)
 			stackedLSTM=tf.contrib.rnn.MultiRNNCell([basicLSTM]*numLayers,state_is_tuple = True)
 
 			with tf.variable_scope('decoder') as scope:
@@ -55,35 +55,35 @@ class sec2sec(object):
 			self.trainFit= tf.contrib.layers.optimize_loss(self.loss,global_step=globalStep,optimizer='Adam',learning_rate = lr,clip_gradient = 2.)
 		__graph__()	
 		sys.stdout.write('</log>')
-	def getFeed(self, X, Y, keep_prob):
+	def getFeed(self, X, Y, probKeep):
 		feedDictionary = {self.enc_ip[t]: X[t] for t in range(self.xseq_len)}
 		feedDictionary.update({self.labels_fwd[t]: Y[t] for t in range(self.yseq_len)})
-		feedDictionary[self.keep_prob] = keep_prob # dropout prob
+		feedDictionary[self.probKeep] = probKeep # dropout prob
         # print("Feed dict: {}".format(feedDictionary))
 		return feedDictionary
 
     # run one batch for training
-	def trainBatch(self, sess, trainBatchGen):
+	def trainBatch(self, sess, batchTrainGenerate):
         # get batches
-		batchX, batchY = trainBatchGen.__next__()
+		batchX, batchY = batchTrainGenerate.__next__()
 #!!!! Important play with the keep probality to see changes
-		feedDictionary = self.getFeed(batchX, batchY, keep_prob=0.5)
+		feedDictionary = self.getFeed(batchX, batchY, probKeep=0.5)
 		summary,_, lossEval = sess.run([self.train_op, self.loss], feedDictionary)
 		return summary,lossEval
 
-	def evalStep(self, sess, evalBatchGen):
+	def evalStep(self, sess, batchValidationGenerate):
         # get batches
-		batchX, batchY = evalBatchGen.__next__()
-		feedDictionary = self.getFeed(batchX, batchY, keep_prob=1.)
+		batchX, batchY = batchValidationGenerate.__next__()
+		feedDictionary = self.getFeed(batchX, batchY, probKeep=1.)
 		lossEval, decodeOpEval = sess.run([self.loss, self.decode_outputs_test_fwd], feedDictionary)
 		decodeOpEval = np.array(decodeOpEval).transpose([1,0,2])
 		return lossEval, decodeOpEval, batchX, batchY
 
     # evaluate 'numBatches' batches
-	def evalBatch(self, sess, evalBatchGen, numBatches):
+	def evalBatch(self, sess, batchValidationGenerate, numBatches):
 		losses = []
 		for i in range(numBatches):
-			lossEval, decodeOpEval, batchX, batchY = self.evalStep(sess, evalBatchGen)
+			lossEval, decodeOpEval, batchX, batchY = self.evalStep(sess, batchValidationGenerate)
 			losses.append(lossEval)
 		return np.mean(losses)
 	def train(self, train_set, valid_set, sess=None ):
@@ -109,10 +109,10 @@ class sec2sec(object):
 		valLossEvaluationStep = 100
 		for i in range(self.epochs):
 			if i == 0:
-				epoch_start_time = time.time()
+				timeStartEpoch = time.time()
 			for j in range(numSteps):
 				if j == 0:
-					steps_start_time = time.time()
+					s = time.time()
 				try:
                     summary, _ = self.trainBatch(sess, merged, train_set)
                     summary_writer.add_summary(summary)
@@ -120,31 +120,31 @@ class sec2sec(object):
 					print('Interrupted by user at iteration {}'.format(i))
 					self.session = sess
 				if j and j % valLossEvaluationStep == 0:
-					val_loss = self.evalBatch(sess, valid_set, 8)
+					lossEval = self.evalBatch(sess, valid_set, 8)
                     # writer.add_summary(summary)
-					steps_eval_time = time.time() - steps_start_time
-					print('val loss : {0:.6f} in {1:.2f} secs Epoch: {2}/{3} step/epoch'.format(val_loss,
-                                                                                                steps_eval_time, j, i))
-					if i > 0 and val_loss > previousValLoss:
+					timeEvalSteps = time.time() - s
+					print('val loss : {0:.6f} in {1:.2f} secs Epoch: {2}/{3} step/epoch'.format(lossEval,
+                                                                                                timeEvalSteps, j, i))
+					if i > 0 and lossEval > previousValLoss:
 						saver.save(sess, self.checkPointPath + self.methodName + '.ckpt', global_step=i)
-						previousValLoss.append(val_loss)
+						previousValLoss.append(lossEval)
 						if len(previousValLoss) >= patience:
-							print("Early stopping at {0}/{1} with validation loss: {2}".format(j, i, val_loss))
+							print("Early stopping at {0}/{1} with validation loss: {2}".format(j, i, lossEval))
 							return sess
-					if val_loss < previousValLoss and previousValLoss is not None:
+					if lossEval < previousValLoss and previousValLoss is not None:
 						previousValLoss = list()
-					previousValLoss = val_loss
-					steps_start_time = time.time()
+					previousValLoss = lossEval
+					s = time.time()
 
             # save model to disk
 			saver.save(sess, self.checkPointPath + self.methodName + '.ckpt', global_step=i)
             # evaluate to get validation loss
-			val_loss = self.evalBatch(sess, valid_set, 8)  # TODO : and this
-			epoch_eval_time = time.time() - epoch_start_time
-			print('val loss : {0:.6f} in {1:.2f} secs Epoch: {2} epoch'.format(val_loss, epoch_eval_time, i))
-			epoch_start_time = time.time()
+			lossEval = self.evalBatch(sess, valid_set, 8)  # TODO : and this
+			timeEvalEpoch = time.time() - timeStartEpoch
+			print('val loss : {0:.6f} in {1:.2f} secs Epoch: {2} epoch'.format(lossEval, timeEvalEpoch, i))
+			timeStartEpoch = time.time()
             # print stats
-			print('\nModel saved to disk at iteration #{} with loss:{}'.format(i, val_loss))
+			print('\nModel saved to disk at iteration #{} with loss:{}'.format(i, lossEval))
 			sys.stdout.flush()
 		return sess
 
@@ -167,7 +167,7 @@ class sec2sec(object):
     # prediction
 	def predict(self, sess, X):
 		feedDictionary = {self.enc_ip[t]: X[t] for t in range(self.xseq_len)}
-		feedDictionary[self.keep_prob] = 1.
+		feedDictionary[self.probKeep] = 1.
 		decodeOpEval = sess.run(self.decode_outputs_test_fwd, feedDictionary)
         # dec_op_v is a list; also need to transpose 0,1 indices
         #  (interchange batch_size and timesteps dimensions

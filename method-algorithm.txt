@@ -1,6 +1,6 @@
 TL-DR:
 input encoder and labels, lstm cells, loss function for minimizing,
-manually feed the network with a batch
+manually feed the network with a batch for training and evaluation
 import libaries including tf 14
 
 class sec2sec(object):
@@ -81,4 +81,3 @@ evaluation step
 eval_batch_genuse the batchX and batch Y 
 genreate feed dictionary loss_v (lossEva) is where we optimize our network
 
-  fgf

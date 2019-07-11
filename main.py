@@ -10,11 +10,9 @@
 # Description: This is our main class where he handle the preprocessing, prediciton in one class
 # The goal is to have only two modules for preprocessing and one prediction module for the use of seq2seq model
 
-"""Here is the setup"""
-# Importing the packages
 import os
 import re
-# import numpy as np
+import numpy as np
 
 # importing the model for seq2seq
 
