@@ -18,8 +18,8 @@ from math import ceil
 class Preprocess:
 
 	def __init__(self):
-		unit = 0
-		counter = [['unit',0]]
+		self.unit = 0
+		self.counter = [['unit',0]]
 
 	def localLoad(self):
 		df = pd.read_excel("data/mem30s.xlsx")
@@ -52,6 +52,25 @@ class Preprocess:
 		else:
 			print("{} already exists".format(filePathNobz2))
 			return filePathNobz2
+	def getAsus(fileName):
+		asusSet=set()
+		with open(fileName,'r') as f:
+			for line in f:
+				splits = line.strip().strip(",")
+				if splits[0] in asusSet:
+					pass
+				else:
+					asusSet.add(splits[0])
+		pass
+		return len(asusSet),list(asusSet)
+
+	def randBatchGen(x,y,batchSize):
+		while True:
+			sampleID = sample(list(np.arange(len(x))),batchSize)
+			yield x[sampleID].T, y[sampleID].T
+
+	def decode(sequence,lookup,seperator=''):
+		return separator.join([lookup[element] for element in sequence if element])
 
 
 
