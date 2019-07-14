@@ -17,6 +17,12 @@ from math import ceil
 
 class Preprocess:
 
+	"""Preprocess class	
+	Attributes:
+	    counter (list): Description
+	    unit (int): Description
+	"""
+	
 	def __init__(self):
 		self.unit = 0
 		self.counter = [['unit',0]]
@@ -24,7 +30,7 @@ class Preprocess:
 	def localLoad(self):
 		df = pd.read_excel("data/mem30s.xlsx")
 		print(df.head())
-
+		#Further preprocessing the df file
 	def unzipFile(zipped,unzipped):
 		print('unzipFile {} to {}'.format(zipped, unzipped))
 		with bz2.BZ2File(zipped, 'rb') as file:

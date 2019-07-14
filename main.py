@@ -1,27 +1,12 @@
-# Author: github.com/ashfarhangi
-# TL-DR: this is the main py file where we handle the preprocessing, prediciton model,
- # and plot customized for a specific project
-# 1.import file
-# 2.call preprocess methods for indexing the sectors (encode,decode)
-# 3.call prediciton model for start on sess 
-# 4. predict or train based on if statement and checkPoint 
-# 5. plot
-
-# Description: This is our main class where he handle the preprocessing, prediciton in one class
-# The goal is to have only two modules for preprocessing and one prediction module for the use of seq2seq model
-
+"""Author: github.com/ashfarhangi
+"""
 import os
 import re
 import numpy as np
-
-# importing the model for seq2seq
-
 from preprocess import Preprocess
 from method import Method
-# importing packages
-# importing seq model.py, plot.py preprocess.py
-class Main:
 
+class Main:
 	"""The main class where it handles two packages
 	
 	Attributes:
@@ -33,11 +18,13 @@ class Main:
 	    segmentSize (int): Description
 	    trainMode (bool): Description
 	    url (str): Description
-	    vocabFreq (int): Description
+	    vocabFreq (int): frequency of a block address that is repeated more than 5 times
 	    windowSize (int): Description
 	"""
 	
 	def __init__(self):
+		"""initializing
+		"""
 # <Preprocess>
 # download link
 # hyperparameters : batch, epochs and more
@@ -56,14 +43,16 @@ class Main:
 		self.url = 'http://skuld.cs.umass.edu/traces/storage/Financial1.spc.bz2'
 	
 	def main(self):
-		
+		"""Handling the preprocess, neural network, plot
+		"""
 		while self.boolWhile:
 			x.preprocess()
 			x.predict()
 			self.boolWhile = False
 	
 	def preprocess(self):
-
+		"""Preprocess
+		"""
 		y.toggleDownload(dataDir='data',fileName=self.fileName, url = self.url)
 		_, sector2index,index2sector,_ =y.prepareSectorSequence(dataDir="data",
 			trace=self.fileName,vocabFreq=vocabFreq,windowSize=windowSize,
@@ -86,9 +75,10 @@ class Main:
 		print("test count: {}".format(testX.shape[0]))
 		batchTrainGenerate= y.batchRandomGenerate(trainX,trainY,batchSize)
 		batchValidationGenerate= y.batchRandomGenerate(testX,testY,batchSize)
-		#fin
+		
 	def predict(self):
-
+		"""Prediction sec2sec
+		"""
 		network= z.sec2sec(
 			trainSize=trainXCount,
 			batchSize=batchSize,
@@ -135,14 +125,13 @@ class Main:
 								preds.append(block)
 							replies.append(decoded)
 		def plot(self):
+			"""Ploting
+			"""
 			label= np.asarray(label,dtype=np.int64)
 			prediciton=np.asarray(prediciton,dtype=np.int64)
 			p.plotPrediction(label,prediciton,segmentSize,vocabFreq,windowSize)	
 if __name__ == "__main__":
 	x = Main()
-	y = Preprocess()
-	z = Method()
-	# p = Plot()
 	x.main()
 else:
 	print("module used:", __name__)
