@@ -7,7 +7,7 @@ TL-DR: this is the main py file where we handle the preprocessing, prediciton mo
 
 importing packages
 importing seq model.py, plot.py preprocess.py
-<Preprocess>
+<Preprocess> 
 download link
 hyperparameters : batch, epochs and more
 toggle download<pre> 
