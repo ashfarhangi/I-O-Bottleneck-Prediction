@@ -1,13 +1,11 @@
 Trace file format
 =================
 Description
---------
 In preprocessing of financial1.bz we first split our data into 23 asu number where Application specific Unit will act as a file name that we put all the related files into it. This will enable us 
 After using the time window 64ms we created a new dictionary file that all the sequences that we caught with reduced vocabs.
 This enabled us to find how many vocabs are in a single dictionary, we found out most them are have 5 sequences of vocab where the max is 19 sequences. This is where the limit of seq that nlp will learn. Now we build 19 LSTM cells as encoder and decoder and feed the train and test into them.
 Not to mention that the input X and test all have 19 tokens this are just tokens of popular block address. There should be about 66 numbers. Training in this fashion reduces the computational load and increases our efficiency.
 Overview
---------
 
 The trace file is composed of **variable length ACSII records, rather than
 binary data**. Although this format is somewhat wasteful of storage space and
